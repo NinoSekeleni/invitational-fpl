@@ -721,7 +721,7 @@ footer .fupd{font-size:10.5px;color:var(--mut);letter-spacing:1px;text-transform
   <section class="sec" id="trophyroom">
     <div class="sechead">
       <div><div class="tag">The Record Books</div><h2>The Trophy Room</h2></div>
-      <p>Every award in the league and exactly who owns it — crowns, all-time records, milestone clubs, founding honours and the one nobody wants.</p>
+      <p>Every award in the league and exactly who owns it — crowns, all-time records, milestone clubs, and the one nobody wants.</p>
     </div>
     <div id="trophyroomout"></div>
   </section>
@@ -1290,10 +1290,6 @@ function renderTrophyRoom(){
   const classicHolders=tallyList(CHAMPIONS);
   const h2hHolders=tallyList(H2H_CHAMPIONS);
 
-  // ----- founding honours -----
-  const founder=PLAYERS.find(p=>p.founder);
-  const founding=PLAYERS.filter(p=>p.debut==='2015/16'&&!p.founder).map(p=>p.full.split(' ')[0]).sort();
-
   // ----- milestone clubs -----
   const sub100=PLAYERS.filter(p=>Object.values(p.s).some(([,rk])=>rk<100000)).map(p=>p.full.split(' ')[0]).sort();
   const club2400=PLAYERS.filter(p=>Object.values(p.s).some(([pt])=>pt>=2400)).map(p=>p.full.split(' ')[0]).sort();
@@ -1313,10 +1309,6 @@ function renderTrophyRoom(){
       card('marquee','⏳','Most Seasons Played',mostS.p.full,`<b>${mostS.cnt} seasons</b> on the team-sheet — a true fixture of the format.`),
       card('marquee','📐','Best Average / Season',bestAvg.p.full,`<b>${fmt(bestAvg.avg)} pts/szn</b>, min. four seasons. Pound-for-pound the most reliable.`),
       card('marquee','🚀','Biggest Year-on-Year Jump',climb.p.full,`<b>+${fmt(climb.v)}</b> into ${climb.s}. The steepest single-season leap anyone has managed.`)
-    ]),
-    group('Founding Honours',[
-      card('cyan','👑','Founder & Commissioner',founder?founder.full:'—',`Started the whole thing and still runs it.`),
-      card('cyan','🎖️','Founding Members',founding.length?founding.join(' · '):'—',`In from the very first season, 2015/16. The originals.`)
     ]),
     group('Milestone Clubs',[
       card('','🌍','The Sub-100k Club',sub100.length?sub100.join(' · '):'—',`Have finished a season inside the global top 100,000 at least once.`),
