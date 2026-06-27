@@ -10,7 +10,7 @@ A self-contained **Fantasy Premier League Hall of Fame** for the Pundits Group I
 
 There are no commands to run. Open `index.html` directly in a browser. Validate logic changes by porting critical JS to Python via Bash.
 
-The site is published via GitHub Pages at `https://ninosekeleni.github.io/invitational-fpl/` — that canonical URL is what gets shared. Commit and push to `main` to deploy. (There used to be a duplicate `Invitational Hall of Fame.html` kept in sync by hand; it was removed in favour of the single canonical Pages URL.)
+The site is published via GitHub Pages at `https://ninosekeleni.github.io/invitational-fpl/` — that canonical URL is what gets shared. Commit and push to `main` to deploy.
 
 ## File structure
 
@@ -43,16 +43,19 @@ Each player object: `{name, full, club, s}` where `s` is `{"YYYY/YY": [points, w
 - `club` must match a key in `LOGOS` and `CLUBCODE`
 
 ### `DEBUTS` — Invitational debut season
-Separate from FPL data history. Used to compute rivalry windows — only seasons from `max(A.debut, B.debut)` onwards count as shared Invitational seasons.
+Separate from FPL data history. Used to scope all Invitational stats — only seasons from `max(A.debut, B.debut)` onwards count as shared Invitational seasons.
 
 ```js
 const DEBUTS = { "Nino":"2015/16", "Azi":"2022/23", ... };
-const FOUNDER = "Nino"; // drives "Founder & Commissioner" trophy
+const FOUNDER = "Nino"; // drives "Founder & Commissioner" trophy in profile modals
 ```
 After setting `DEBUTS`, the code attaches `p.debut` and `p.founder` to each player object.
 
-### `CHAMPIONS` — Roll of Honour
+### `CHAMPIONS` — Classic League Roll of Honour
 11 seasons of winners. Array of `["YYYY/YY", "PlayerName"]` pairs. Names must match `p.name`.
+
+### `H2H_CHAMPIONS` — H2H League Roll of Honour
+FPL Head-to-Head League winners, run concurrently with the Classic League. Array of `["YYYY/YY", name|null, h2hPoints]`. Use `null` for seasons not contested (e.g. 2025/26). Names must match `p.name`.
 
 ### `XII` — Registration config
 ```js
@@ -70,25 +73,48 @@ const REGISTERED = [];        // add {name, team, paid:bool} entries here
 ### `LOGOS` — base64 club crests
 Six clubs: `Arsenal`, `Chelsea`, `Leeds United`, `Liverpool`, `Man City`, `Man Utd`. Resize source PNGs to 160px via `sips -Z 160`, encode via Python `base64.b64encode`, embed as `data:image/png;base64,...`.
 
-## Rivalry system
+## Leaderboard & filter mode
 
-`sharedSeasons(A, B)` is the critical function — it determines valid rivalry overlap. It starts from `max(A.debut, B.debut)` and only includes seasons where both players have a recorded score. Any change to rivalry logic must go through this function, not raw FPL data overlap.
+`statsFor(player, seasons)` computes `{tot, cnt, avg, best, peakP}` for any season subset.
 
-Rivalry scoring formula (in `detectRivalries`):
+The global `MODE` variable drives both the leaderboard and the Head-to-Head comparator simultaneously. Three filter tabs:
+- `'this'` — 25/26 Season only
+- `'inv'` — The Invitational (2015/16+, default, debut-aware)
+- `'all'` — All-Time (full FPL history from 2011/12)
+
+Per-season picker drops a single season string into `MODE`. `windowSeasons(mode)` converts `MODE` to the relevant season array. `renderAll()` re-renders the leaderboard and H2H comparator together when the filter changes.
+
+**Debut-awareness is load-bearing.** The Invitational leaderboard, dashboard teaser, biggest movers, and H2H comparator all gate on `p.debut` — a late joiner cannot accumulate pre-league seasons toward their Invitational total. The All-Time view uses the full FPL dataset by design.
+
+## Head-to-Head comparator
+
+`renderH2H()` builds the comparator in the Hall of Fame tab. It follows the active `MODE` via `h2hSeasons(A, B)`:
+- `'inv'` → `sharedSeasons(A, B)` (debut-aware overlap)
+- `'all'` / single-season → `windowSeasons(MODE).filter(s=>A.s[s]&&B.s[s])`
+
+`sharedSeasons(A, B)` starts from `max(A.debut, B.debut)` and only includes seasons both players have scores for — this is the canonical function for any Invitational-scoped comparison.
+
+**Single-season mode** returns early with a focused output (margin, both scores/ranks, verdict) — streak/momentum/superiority cards are deliberately suppressed.
+
+**Superiority Rating** (multi-season only) is zero-sum around 5.5:
 ```
-score = closeness×175 + leadChanges×15 + balance×16 + sharedSeasons×0.9 + (familyBonus?24:0)
+5.5 + (winRate−0.5)×6 + (pointsShare−0.5)×8 + rankEdge(±0.4)   clamped 1–10
 ```
-In `playerTopRival`, the family bonus is reduced to 6 so closeness dominates for per-player "fiercest rival" display.
+The two managers always contrast (e.g. 7.9 vs 3.1).
 
-**7 distinct rivalry copy templates** (`RIV_TEMPLATES`) + **2 family templates** (`FAM_TEMPLATES`) — no two rivalries should share the same opener, body, or closing line. The `rivBits(r)` helper extracts all needed variables.
+Dropdowns are alphabetical by `p.full`. `fillH2HSelects()` populates them.
 
-## Leaderboard
+## Champions tab
 
-`statsFor(player, seasons)` computes `{tot, cnt, avg, best, peakP}` for any season subset. Leaderboard filters: This Season · Past 5 · Past Decade · All-time · Invitational era (2015/16, default) · per-season picker. Sort toggle: Total Points vs Avg/Season.
+Two stacked sections rendered by separate functions:
+- `renderChampions()` → Classic League roll of honour (`#hofstats`, `#rollwrap`)
+- `renderH2HChampions()` → H2H League roll of honour (`#h2hhofstats`, `#h2hrollwrap`)
+
+Click handlers must be scoped to their own container (`#rollwrap .rollrow[data-nm]` vs `#h2hrollwrap .rollrow[data-nm]`) to avoid cross-table conflicts.
 
 ## Trophy cabinet
 
-`playerTrophies(p)` auto-awards badges: Founder, Founding Member (debut==="2015/16" only), Champion, all-time superlatives, FPL rank milestones. Displayed in player profile modals.
+`playerTrophies(p)` auto-awards badges shown in player profile modals: Founder & Commissioner, Founding Member (debut==="2015/16" and not founder), Classic League Champion, H2H League Champion, all-time superlatives, FPL rank milestones. The Trophy Room section on the Hall of Fame tab (`renderTrophyRoom`) is a separate grouped display — not everything in `playerTrophies` appears there.
 
 ## OG / social meta
 
@@ -104,3 +130,9 @@ Lines 15–24 of `<head>` contain `og:url`, `og:image`, and `twitter:image` poin
 ## Keeping data current
 
 Bump the `UPDATED` constant (near `const CURRENT`) when you refresh the season data — it drives the "Last updated" line in the footer.
+
+## Validating logic without a server
+
+The sandbox blocks `python3 -m http.server`. Validate by:
+- Extracting JS logic and porting to Python via Bash (regex-parse `PLAYERS`/`DEBUTS`/`ALLSEASONS` from the HTML, recompute key outputs)
+- Bracket-balance check: strip string literals/comments, count `{([` vs `})]` — catches gross syntax errors
