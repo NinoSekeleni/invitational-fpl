@@ -205,6 +205,19 @@ select:focus,.searchbox:focus{border-color:var(--cyan)}
 .riv .rmeta b{display:block;font-family:'Oswald';font-size:17px;color:#fff;margin-top:2px;letter-spacing:0}
 .fam{display:inline-block;font-size:9px;letter-spacing:1.5px;color:var(--gold);border:1px solid rgba(255,206,58,.3);background:rgba(255,206,58,.08);padding:2px 7px;border-radius:100px;margin-left:8px;vertical-align:middle}
 
+/* ---------- head to head ---------- */
+.h2hpick{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.h2hpick select{flex:1;min-width:150px;font-size:14px;padding:12px 14px}
+.h2hpick .vs{font-family:'Anton';color:var(--mag);font-size:20px;flex:0 0 auto}
+.h2htbl{margin-top:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.h2hr{display:grid;grid-template-columns:1.4fr 1fr 1fr;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
+.h2hr:last-child{border-bottom:0}
+.h2hr.hd{background:var(--panel2);text-transform:uppercase;font-size:10px;letter-spacing:1px;font-weight:600;color:var(--mut);font-family:'Oswald'}
+.h2hr .sn{font-family:'Oswald';font-size:13.5px;color:var(--silver)}
+.h2hr .v{text-align:center;font-family:'Oswald';font-weight:600;font-size:15px;color:var(--mut)}
+.h2hr .v.w{color:var(--lime)}
+.h2hempty{color:var(--mut);font-size:14px;padding:20px;text-align:center;border:1px dashed var(--line2);border-radius:12px}
+
 /* ---------- honours ---------- */
 .honours{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
 .hon{border:1px solid var(--line2);border-radius:16px;padding:20px;background:linear-gradient(180deg,var(--panel2),var(--panel));position:relative;overflow:hidden}
@@ -515,6 +528,7 @@ footer .meth{max-width:660px;margin:0 auto 22px;font-size:12.5px;color:var(--mut
 footer .meth b{color:var(--silver)}
 footer .fbrand{font-family:'Anton';font-size:30px;color:#fff;letter-spacing:1px}
 footer .fmut{font-size:11px;color:var(--mut2);letter-spacing:2px;text-transform:uppercase;margin-top:8px}
+footer .fupd{font-size:10.5px;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin-top:14px;opacity:.8}
 .empty{padding:50px;text-align:center;color:var(--mut);font-family:'Oswald';letter-spacing:1px}
 .fade{animation:fade .4s both}@keyframes fade{from{opacity:0}to{opacity:1}}
 </style>
@@ -678,6 +692,19 @@ footer .fmut{font-size:11px;color:var(--mut2);letter-spacing:2px;text-transform:
     <div class="rivgrid" id="rivgrid"></div>
   </section>
 
+  <section class="sec" id="h2h">
+    <div class="sechead">
+      <div><div class="tag">Settle It</div><h2>Head to Head</h2></div>
+      <p>Pick any two managers and compare their Invitational records — season by season, from when they were both in the league.</p>
+    </div>
+    <div class="h2hpick">
+      <select id="h2hA"></select>
+      <span class="vs">VS</span>
+      <select id="h2hB"></select>
+    </div>
+    <div id="h2hout"></div>
+  </section>
+
   <section class="sec" id="honours">
     <div class="sechead">
       <div><div class="tag">The Record Books</div><h2>Honours &amp; Records</h2></div>
@@ -826,6 +853,7 @@ footer .fmut{font-size:11px;color:var(--mut2);letter-spacing:2px;text-transform:
   <p class="meth"><b>How it's scored.</b> Points are the official FPL season totals from each contestant's history. The leaderboard ranks by <b>cumulative points</b> within the chosen window; not everyone played every season, so <b>Avg/Szn</b> levels the field for those who started late. The <b>Invitational era</b> (2015/16+) is the default — that's where the league's real counting begins. Rivalries weigh shared seasons, points gap and lead-changes. Data current to the 2025/26 season.</p>
   <div class="fbrand">The Invitational Hall of Fame</div>
   <div class="fmut">Fantasy Premier League · Est. 2015/16</div>
+  <div class="fupd" id="fupd"></div>
 </div></footer>
 
 <script>
@@ -894,6 +922,7 @@ const CHAMPIONS=[
 
 const ALLSEASONS=["2011/12","2012/13","2013/14","2014/15","2015/16","2016/17","2017/18","2018/19","2019/20","2020/21","2021/22","2022/23","2023/24","2024/25","2025/26"];
 const CURRENT="2025/26";
+const UPDATED="27 June 2026"; // ← bump this whenever the season data is refreshed (drives the footer "Last updated")
 
 /* ============================ THE XII — REGISTRATION CONFIG ============================ */
 /* ↓↓↓ EDIT THESE FOUR LINES ↓↓↓ */
@@ -1462,11 +1491,15 @@ function openProfile(name){
     </div>`;
   const modal=document.getElementById('modal');
   modal.classList.add('open');document.body.style.overflow='hidden';
-  document.getElementById('mclose').onclick=closeModal;
+  const mc=document.getElementById('mclose');
+  mc.onclick=closeModal;
   document.getElementById('dlclose').onclick=closeModal;
   document.getElementById('dlcard').onclick=function(){downloadCard(p,this);};
+  lastFocus=document.activeElement;           // remember what to restore focus to
+  setTimeout(()=>mc.focus(),0);               // move keyboard focus into the dialog
 }
-function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
+let lastFocus=null;
+function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';if(lastFocus&&lastFocus.focus){lastFocus.focus();lastFocus=null;}}
 document.getElementById('modalbg').onclick=closeModal;
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
@@ -1590,6 +1623,18 @@ function renderDashboard(){
   const longest=[...all].sort((a,b)=>b.cnt-a.cnt)[0];
   const bestRk=[...all].filter(o=>o.best!=null).sort((a,b)=>a.best-b.best)[0];
   const peak=[...all].sort((a,b)=>b.peakP-a.peakP)[0];
+  // biggest season-over-season swing (consecutive Invitational-era seasons)
+  let riser=null,faller=null;
+  PLAYERS.forEach(p=>{
+    const d=p.debut||'2015/16';
+    const ss=inv.filter(s=>s>=d&&p.s[s]); // only seasons from this player's Invitational debut onward
+    for(let k=1;k<ss.length;k++){
+      if(ALLSEASONS.indexOf(ss[k])-ALLSEASONS.indexOf(ss[k-1])!==1)continue; // consecutive only
+      const d=p.s[ss[k]][0]-p.s[ss[k-1]][0];
+      if(!riser||d>riser.d)riser={p,d,from:ss[k-1],to:ss[k]};
+      if(!faller||d<faller.d)faller={p,d,from:ss[k-1],to:ss[k]};
+    }
+  });
   const cards=[
     ['👥','Contestants',fmt(PLAYERS.length),'managers in the record books'],
     ['📅','Seasons counted',String(seasonsCount.size),'of FPL history on file'],
@@ -1598,7 +1643,9 @@ function renderDashboard(){
     ['⚔️','Closest rivalry',rv?`${rv.gap} pts`:'—',rv?`<b>${rv.A.full.split(' ')[0]}</b> vs <b>${rv.B.full.split(' ')[0]}</b>, the tightest on record`:''],
     ['⏳','Longest-running',`${longest.cnt} seasons`,`set by <b>${longest.p.full}</b>`],
     ['🎯','Best world rank',bestRk?`#${fmt(bestRk.best)}`:'—',`the league's finest single season`],
-    ['💥','Highest score',fmt(peak.peakP),`one season, by <b>${peak.p.full.split(' ')[0]}</b>`]
+    ['💥','Highest score',fmt(peak.peakP),`one season, by <b>${peak.p.full.split(' ')[0]}</b>`],
+    ['📈','Biggest leap',riser?`+${fmt(riser.d)}`:'—',riser?`<b>${riser.p.full.split(' ')[0]}</b>, ${riser.from} → ${riser.to}`:''],
+    ['📉','Biggest fall',faller?fmt(faller.d):'—',faller?`<b>${faller.p.full.split(' ')[0]}</b>, ${faller.from} → ${faller.to}`:'']
   ];
   document.getElementById('dashgrid').innerHTML=cards.map(c=>`<div class="dcard"><div class="di">${c[0]}</div><div class="dk">${c[1]}</div><div class="dv">${c[2]}</div><div class="ds">${c[3]}</div></div>`).join('');
   // top-5 teaser (invitational era, total)
@@ -1703,7 +1750,53 @@ function renderRegister(){
   };
 }
 
+/* ============================ HEAD TO HEAD ============================ */
+function fillH2HSelects(){
+  const opts=PLAYERS.map(p=>`<option value="${p.name}">${p.full}</option>`).join('');
+  const a=document.getElementById('h2hA'),b=document.getElementById('h2hB');
+  a.innerHTML=opts;b.innerHTML=opts;
+  a.value=PLAYERS[0].name;b.value=PLAYERS[1]?PLAYERS[1].name:PLAYERS[0].name;
+  a.onchange=renderH2H;b.onchange=renderH2H;
+  renderH2H();
+}
+function renderH2H(){
+  const A=PLAYERS.find(p=>p.name===document.getElementById('h2hA').value);
+  const B=PLAYERS.find(p=>p.name===document.getElementById('h2hB').value);
+  const out=document.getElementById('h2hout');
+  if(!A||!B){out.innerHTML='';return;}
+  if(A===B){out.innerHTML=`<div class="h2hempty">Pick two different managers to compare.</div>`;return;}
+  const common=sharedSeasons(A,B);
+  if(!common.length){out.innerHTML=`<div class="h2hempty"><b>${A.full}</b> and <b>${B.full}</b> haven't shared a season in the Invitational yet — no head-to-head on record.</div>`;return;}
+  let ta=0,tb=0,wa=0,wb=0;
+  const rows=common.slice().reverse().map(s=>{
+    const pa=A.s[s][0],pb=B.s[s][0];ta+=pa;tb+=pb;
+    const aw=pa>pb,bw=pb>pa;if(aw)wa++;else if(bw)wb++;
+    return `<div class="h2hr"><div class="sn">${s}</div><div class="v ${aw?'w':''}">${fmt(pa)}</div><div class="v ${bw?'w':''}">${fmt(pb)}</div></div>`;
+  }).join('');
+  const aLead=ta>tb,bLead=tb>ta;
+  const fa=A.full.split(' ')[0],fb=B.full.split(' ')[0];
+  out.innerHTML=`
+    <div class="riv">
+      <div class="vsrow">
+        <div class="side ${aLead?'lead':''}"><div class="nm">${A.full}</div><div class="cl">${A.club}</div><div class="pt">${fmt(ta)}</div></div>
+        <div class="mid">VS</div>
+        <div class="side ${bLead?'lead':''}"><div class="nm">${B.full}</div><div class="cl">${B.club}</div><div class="pt">${fmt(tb)}</div></div>
+      </div>
+      <div class="rmeta">
+        <div>Shared seasons<b>${common.length}</b></div>
+        <div>Season wins<b>${wa}–${wb}</b></div>
+        <div>Points gap<b>${fmt(Math.abs(ta-tb))}</b></div>
+      </div>
+      <div class="h2htbl">
+        <div class="h2hr hd"><div>Season</div><div class="v">${fa}</div><div class="v">${fb}</div></div>
+        ${rows}
+      </div>
+    </div>`;
+}
+
 /* init */
+document.getElementById('fupd').textContent='Last updated '+UPDATED;
+fillH2HSelects();
 renderStatStrip();renderSeasonPick();renderWoodenSpoon();renderRivalries();renderHonours();setupReplay();renderAll();renderDashboard();renderChampions();renderRules();renderRegister();renderCountdowns();setInterval(renderCountdowns,1000);wireTabs();
 </script>
 </body>

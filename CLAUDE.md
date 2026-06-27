@@ -10,18 +10,13 @@ A self-contained **Fantasy Premier League Hall of Fame** for the Pundits Group I
 
 There are no commands to run. Open `index.html` directly in a browser. Validate logic changes by porting critical JS to Python via Bash.
 
-After every edit to `index.html`, sync the companion file:
-```bash
-cp "index.html" "Invitational Hall of Fame.html"
-```
-Both files must always be identical. `Invitational Hall of Fame.html` is the filename that was originally shared with league members.
+The site is published via GitHub Pages at `https://ninosekeleni.github.io/invitational-fpl/` — that canonical URL is what gets shared. Commit and push to `main` to deploy. (There used to be a duplicate `Invitational Hall of Fame.html` kept in sync by hand; it was removed in favour of the single canonical Pages URL.)
 
 ## File structure
 
 | File | Purpose |
 |------|---------|
-| `index.html` | The entire app (363 KB, self-contained) |
-| `Invitational Hall of Fame.html` | Exact copy — the URL members have saved |
+| `index.html` | The entire app (self-contained) |
 | `og-maker.html` | Browser-run asset generator — open once to download og-image.png, icon-512.png, icon-192.png |
 | `manifest.webmanifest` | PWA manifest referencing icon-192.png and icon-512.png |
 | `og-image.png`, `icon-192.png`, `icon-512.png` | Generated from og-maker.html, must sit next to index.html |
@@ -97,11 +92,15 @@ In `playerTopRival`, the family bonus is reduced to 6 so closeness dominates for
 
 ## OG / social meta
 
-Lines 17–24 of `<head>` contain `og:url`, `og:image`, and `twitter:image` pointing to `https://YOURNAME.github.io/invitational/`. Replace with the real GitHub Pages URL before deploying.
+Lines 15–24 of `<head>` contain `og:url`, `og:image`, and `twitter:image` pointing to `https://ninosekeleni.github.io/invitational-fpl/`. Keep these in sync if the Pages URL ever changes.
 
 ## Adding a new player
 
 1. Add to `PLAYERS` with their FPL season data (transcribed from `FPL Gameweek History/` screenshots)
 2. Add to `DEBUTS` with their first Invitational season
 3. Add their club crest to `LOGOS` if the club isn't already present
-4. Sync: `cp "index.html" "Invitational Hall of Fame.html"`
+4. Commit and push to deploy
+
+## Keeping data current
+
+Bump the `UPDATED` constant (near `const CURRENT`) when you refresh the season data — it drives the "Last updated" line in the footer.
