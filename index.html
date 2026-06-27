@@ -217,6 +217,35 @@ select:focus,.searchbox:focus{border-color:var(--cyan)}
 .h2hr .v{text-align:center;font-family:'Oswald';font-weight:600;font-size:15px;color:var(--mut)}
 .h2hr .v.w{color:var(--lime)}
 .h2hempty{color:var(--mut);font-size:14px;padding:20px;text-align:center;border:1px dashed var(--line2);border-radius:12px}
+/* ---------- h2h expanded ---------- */
+.h2hstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.h2hcard{border:1px solid var(--line2);border-radius:14px;padding:16px 18px;background:linear-gradient(180deg,var(--panel2),var(--panel));position:relative;overflow:hidden}
+.h2hcard.nasty{border-color:rgba(255,46,126,.28);background:linear-gradient(135deg,rgba(255,46,126,.07),var(--panel))}
+.h2hcard.gold{border-color:rgba(255,206,58,.28);background:linear-gradient(135deg,rgba(255,206,58,.06),var(--panel))}
+.h2hcard.cyan{border-color:rgba(0,233,255,.22);background:linear-gradient(135deg,rgba(0,233,255,.05),var(--panel))}
+.h2hck{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);font-weight:600;margin-bottom:8px}
+.h2hcv{font-family:'Oswald';font-weight:600;font-size:22px;color:#fff;line-height:1.1;margin-bottom:5px}
+.h2hcd{font-size:12.5px;color:var(--silver);line-height:1.5}
+.h2hcd b{color:#fff}
+.h2hflair{display:inline-block;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border-radius:100px;padding:2px 8px;margin-bottom:8px;font-weight:700}
+.h2hflair.fraud{color:var(--mag);border:1px solid rgba(255,46,126,.4);background:rgba(255,46,126,.08)}
+.h2hflair.over{color:var(--lime);border:1px solid rgba(0,255,136,.3);background:rgba(0,255,136,.06)}
+.h2hrating{margin:18px 0;border:1px solid var(--line2);border-radius:16px;overflow:hidden;background:var(--panel)}
+.ratttl{text-align:center;padding:14px;background:var(--panel2);border-bottom:1px solid var(--line);font-family:'Oswald';font-weight:700;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold)}
+.ratbody{display:grid;grid-template-columns:1fr auto 1fr}
+.ratside{padding:24px 16px;text-align:center}
+.ratnm{font-family:'Oswald';font-weight:600;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.ratval{font-family:'Anton';font-size:62px;line-height:1;color:var(--mut2)}
+.ratval.hi{color:var(--lime)}.ratval.lo{color:var(--mag)}
+.ratmid{display:flex;align-items:center;padding:0 10px;font-family:'Oswald';font-size:13px;color:var(--mut);padding-top:16px}
+.ratbar{height:6px;border-radius:100px;background:var(--bg2);margin:10px 16px 0;overflow:hidden}
+.ratfill{height:100%;border-radius:100px}
+.h2hverdict{margin:20px 0 0;padding:22px 26px;border-radius:16px;border:1px solid rgba(255,206,58,.28);background:linear-gradient(135deg,rgba(255,206,58,.06),rgba(0,0,0,0));position:relative;overflow:hidden}
+.h2hverdict::before{content:'VERDICT';position:absolute;font-family:'Anton';font-size:80px;color:rgba(255,255,255,.024);right:-8px;top:-14px;pointer-events:none;letter-spacing:2px}
+.vtag{font-family:'Oswald';font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-weight:700}
+.vtxt{font-size:15px;color:var(--silver);line-height:1.6}
+.vtxt b{color:#fff}
+@media(max-width:560px){.h2hstats{grid-template-columns:1fr}.ratval{font-size:46px}}
 
 /* ---------- honours ---------- */
 .honours{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
@@ -1759,6 +1788,12 @@ function fillH2HSelects(){
   a.onchange=renderH2H;b.onchange=renderH2H;
   renderH2H();
 }
+function h2hSupRating(winRate,avgGapForPlayer,avgRankShared){
+  const winScore=winRate*5;
+  const gapScore=Math.max(-2,Math.min(2,avgGapForPlayer/150));
+  const rankScore=Math.max(0,(1-avgRankShared/3000000))*2.5;
+  return Math.max(1,Math.min(10,2.5+winScore+gapScore+rankScore)).toFixed(1);
+}
 function renderH2H(){
   const A=PLAYERS.find(p=>p.name===document.getElementById('h2hA').value);
   const B=PLAYERS.find(p=>p.name===document.getElementById('h2hB').value);
@@ -1766,31 +1801,218 @@ function renderH2H(){
   if(!A||!B){out.innerHTML='';return;}
   if(A===B){out.innerHTML=`<div class="h2hempty">Pick two different managers to compare.</div>`;return;}
   const common=sharedSeasons(A,B);
-  if(!common.length){out.innerHTML=`<div class="h2hempty"><b>${A.full}</b> and <b>${B.full}</b> haven't shared a season in the Invitational yet — no head-to-head on record.</div>`;return;}
-  let ta=0,tb=0,wa=0,wb=0;
-  const rows=common.slice().reverse().map(s=>{
-    const pa=A.s[s][0],pb=B.s[s][0];ta+=pa;tb+=pb;
-    const aw=pa>pb,bw=pb>pa;if(aw)wa++;else if(bw)wb++;
-    return `<div class="h2hr"><div class="sn">${s}</div><div class="v ${aw?'w':''}">${fmt(pa)}</div><div class="v ${bw?'w':''}">${fmt(pb)}</div></div>`;
-  }).join('');
-  const aLead=ta>tb,bLead=tb>ta;
+  if(!common.length){out.innerHTML=`<div class="h2hempty"><b>${A.full}</b> and <b>${B.full}</b> haven't shared an Invitational season yet.</div>`;return;}
+
+  // core accumulation
+  let ta=0,tb=0,wa=0,wb=0,sumRkA=0,sumRkB=0;
+  let humA=0,humAS='',humB=0,humBS=''; // biggest single-season defeat for each
+  const rows=[];
+  common.forEach(s=>{
+    const[pa,rka]=A.s[s],[pb,rkb]=B.s[s];
+    ta+=pa;tb+=pb;sumRkA+=rka;sumRkB+=rkb;
+    if(pa>pb){wa++;const d=pa-pb;if(d>humB){humB=d;humBS=s;}}
+    else if(pb>pa){wb++;const d=pb-pa;if(d>humA){humA=d;humAS=s;}}
+    rows.push({s,pa,pb});
+  });
+  const n=common.length,aLeads=ta>=tb;
+  const avgRkA=sumRkA/n,avgRkB=sumRkB/n;
+  const totalGap=Math.abs(ta-tb),avgGap=totalGap/n;
   const fa=A.full.split(' ')[0],fb=B.full.split(' ')[0];
+  const W=aLeads?A:B,L=aLeads?B:A;
+  const fw=W.full.split(' ')[0],fl=L.full.split(' ')[0];
+
+  // dominance % over decisive (non-draw) seasons
+  const decisive=wa+wb;
+  const domPct=decisive>0?(aLeads?wa:wb)/decisive*100:50;
+
+  // per gameweek gap
+  const perGW=(avgGap/38).toFixed(1);
+
+  // current streak
+  let streakOwner=null,streakLen=0;
+  for(let i=rows.length-1;i>=0;i--){
+    const{pa,pb}=rows[i];if(pa===pb)continue;
+    const winner=pa>pb?A:B;
+    if(!streakOwner){streakOwner=winner;streakLen=1;}
+    else if(winner===streakOwner)streakLen++;
+    else break;
+  }
+
+  // momentum: last 3 shared seasons
+  const last3=rows.slice(-3),mLen=last3.length;
+  const momA=last3.filter(r=>r.pa>r.pb).length;
+  const momB=last3.filter(r=>r.pb>r.pa).length;
+  const momW=momA>momB?A:(momB>momA?B:null);
+  const momWins=momW?(momW===A?momA:momB):0;
+  const momLoss=momW?(momW===A?momB:momA):0;
+
+  // career trajectory: compare win-rate first half vs second half (need >=4 seasons)
+  let trajA='flat',trajB='flat';
+  const half=Math.floor(n/2);
+  if(half>=2){
+    const early=rows.slice(0,half),late=rows.slice(-half);
+    const earlyRateA=early.filter(r=>r.pa>r.pb).length/half;
+    const lateRateA=late.filter(r=>r.pa>r.pb).length/half;
+    trajA=lateRateA>earlyRateA+.15?'rising':lateRateA<earlyRateA-.15?'fading':'flat';
+    trajB=lateRateA<earlyRateA-.15?'rising':lateRateA>earlyRateA+.15?'fading':'flat';
+  }
+  const trajIcon=t=>t==='rising'?'📈':t==='fading'?'📉':'➡️';
+  const trajWord=t=>t==='rising'?'Rising':t==='fading'?'Fading':'Steady';
+  const trajCol=t=>t==='rising'?'var(--lime)':t==='fading'?'var(--mag)':'var(--mut)';
+
+  // career world rank peak (full history, not just shared seasons)
+  let pkA=Infinity,pkAS='',pkB=Infinity,pkBS='';
+  Object.entries(A.s).forEach(([s,[,rk]])=>{if(rk<pkA){pkA=rk;pkAS=s;}});
+  Object.entries(B.s).forEach(([s,[,rk]])=>{if(rk<pkB){pkB=rk;pkBS=s;}});
+  const rankGrade=r=>r<50000?'Elite. Top 50k globally.':r<200000?'Strong. Top 200k.':r<500000?'Solid. Top 500k.':r<1500000?'Decent pedigree.':'Plenty of room to improve.';
+
+  // fraud index: better avg global rank over shared seasons but losing H2H
+  const rankWinner=avgRkA<avgRkB?A:B;
+  const h2hWinner=ta>=tb?A:B;
+  const fraudPlayer=n>=3&&rankWinner!==h2hWinner?rankWinner:null;
+  const overachiever=fraudPlayer?(ta>=tb?A:B):null;
+  const rankGapPct=Math.round(Math.abs(avgRkA-avgRkB)/Math.max(avgRkA,avgRkB)*100);
+
+  // superiority rating
+  const supA=+h2hSupRating(wa/n,(ta-tb)/n,avgRkA);
+  const supB=+h2hSupRating(wb/n,(tb-ta)/n,avgRkB);
+
+  // verdict text
+  let vt='';
+  if(domPct>=80)vt=`<b>${W.full}</b> doesn't just win this matchup — they own it. ${domPct.toFixed(0)}% of decisive seasons, ${fmt(totalGap)} points clear. ${fl} has turned up. The data just doesn't care.`;
+  else if(domPct>=65)vt=`In ${n} shared seasons, <b>${W.full}</b> has been the better manager — and it's becoming a habit. ${fl} is still looking for an answer.`;
+  else if(domPct>=55)vt=`<b>${fw}</b> edges this one on points, but calling it a rivalry is fair. One strong campaign from ${fl} and this flips.`;
+  else if(ta===tb)vt=`A dead heat. ${n} seasons and they're level on total points. The Invitational doesn't give us a winner here — which is the most annoying possible result.`;
+  else vt=`${fmt(totalGap)} points across ${n} seasons. <b>${fw}</b> leads — but ${fl} refuses to accept it. This one stays alive.`;
+  if(fraudPlayer)vt+=` And another thing: <b>${fraudPlayer.full.split(' ')[0]}</b> carries a better global FPL rank on average over these shared seasons — yet is losing the head-to-head. The data does not look good.`;
+
+  // season table
+  const tableRows=rows.slice().reverse().map(r=>{
+    const aw=r.pa>r.pb,bw=r.pb>r.pa;
+    return `<div class="h2hr"><div class="sn">${r.s}</div><div class="v ${aw?'w':''}">${fmt(r.pa)}</div><div class="v ${bw?'w':''}">${fmt(r.pb)}</div></div>`;
+  }).join('');
+
+  // fraud card
+  const fraudCard=n>=3?fraudPlayer
+    ?`<div class="h2hcard nasty" style="grid-column:1/-1">
+        <div class="h2hflair fraud">🚨 FPL Fraud Detected</div>
+        <div class="h2hck">The Fraud Index</div>
+        <div class="h2hcv">${fraudPlayer.full.split(' ')[0]} ranks higher globally. And is still losing.</div>
+        <div class="h2hcd"><b>${fraudPlayer.full.split(' ')[0]}</b> has a better average world rank than <b>${overachiever.full.split(' ')[0]}</b> across their shared seasons — meaning the wider FPL world rates them higher. And yet <b>${overachiever.full.split(' ')[0]}</b> beats them in this league. The rank gap is <b>${rankGapPct}%</b>. That's not noise. Someone goes missing when it matters.</div>
+      </div>`
+    :`<div class="h2hcard" style="grid-column:1/-1">
+        <div class="h2hck">The Fraud Index</div>
+        <div class="h2hcv">No fraud detected.</div>
+        <div class="h2hcd"><b>${(avgRkA<avgRkB?A:B).full.split(' ')[0]}</b> ranks better globally on average <em>and</em> is winning this head-to-head. Form matches expectation. No excuses available for ${(avgRkA<avgRkB?B:A).full.split(' ')[0]}.</div>
+      </div>`
+  :'';
+
+  // trajectory card
+  const trajCard=half>=2
+    ?`<div class="h2hcard" style="grid-column:1/-1">
+        <div class="h2hck">Career Trajectory in this matchup</div>
+        <div class="h2hcv">${trajA!=='flat'?fa+' '+trajWord(trajA):trajB!=='flat'?fb+' '+trajWord(trajB):'No clear shift'}</div>
+        <div class="h2hcd" style="display:flex;flex-direction:column;gap:5px">
+          <span style="color:${trajCol(trajA)}">${trajIcon(trajA)} <b>${fa}</b> — ${trajWord(trajA).toLowerCase()}${trajA==='rising'?' in this fixture. Getting better.':trajA==='fading'?' here. Recent form is weaker than their historical record.':'. Consistently themselves.'}</span>
+          <span style="color:${trajCol(trajB)}">${trajIcon(trajB)} <b>${fb}</b> — ${trajWord(trajB).toLowerCase()}${trajB==='rising'?' in this fixture. Closing the gap.':trajB==='fading'?' here. The slide continues.':'. No momentum either way.'}</span>
+        </div>
+      </div>`
+  :'';
+
   out.innerHTML=`
-    <div class="riv">
+    <div class="riv" style="margin-bottom:16px">
       <div class="vsrow">
-        <div class="side ${aLead?'lead':''}"><div class="nm">${A.full}</div><div class="cl">${A.club}</div><div class="pt">${fmt(ta)}</div></div>
+        <div class="side ${aLeads&&ta!==tb?'lead':''}"><div class="nm">${A.full}</div><div class="cl">${A.club}</div><div class="pt">${fmt(ta)}</div></div>
         <div class="mid">VS</div>
-        <div class="side ${bLead?'lead':''}"><div class="nm">${B.full}</div><div class="cl">${B.club}</div><div class="pt">${fmt(tb)}</div></div>
+        <div class="side ${!aLeads&&ta!==tb?'lead':''}"><div class="nm">${B.full}</div><div class="cl">${B.club}</div><div class="pt">${fmt(tb)}</div></div>
       </div>
       <div class="rmeta">
-        <div>Shared seasons<b>${common.length}</b></div>
-        <div>Season wins<b>${wa}–${wb}</b></div>
-        <div>Points gap<b>${fmt(Math.abs(ta-tb))}</b></div>
+        <div>Shared seasons<b>${n}</b></div>
+        <div>Record<b>${wa}W – ${wb}W</b></div>
+        <div>Points gap<b>${fmt(totalGap)}</b></div>
       </div>
-      <div class="h2htbl">
-        <div class="h2hr hd"><div>Season</div><div class="v">${fa}</div><div class="v">${fb}</div></div>
-        ${rows}
+    </div>
+
+    <div class="h2hstats">
+
+      <div class="h2hcard gold">
+        <div class="h2hck">Dominance</div>
+        <div class="h2hcv">${domPct.toFixed(0)}%</div>
+        <div class="h2hcd"><b>${fw}</b> wins ${domPct.toFixed(0)}% of decisive seasons. ${domPct>=80?'That\'s not a rivalry, that\'s a routine.':domPct>=65?'A comfortable, consistent edge.':domPct>=55?'Slight edge — but it\'s alive.':'Razor-thin. Anyone\'s game.'}</div>
       </div>
+
+      <div class="h2hcard">
+        <div class="h2hck">Points per Gameweek Gap</div>
+        <div class="h2hcv">${perGW} pts/GW</div>
+        <div class="h2hcd"><b>${fw}</b> outscores <b>${fl}</b> by approximately <b>${perGW} points every gameweek</b> on average. Over a full 38-game season that compounds into a gap that's very hard to close.</div>
+      </div>
+
+      <div class="h2hcard ${streakLen>=3?'nasty':streakLen>=2?'cyan':''}">
+        <div class="h2hck">Current Streak</div>
+        <div class="h2hcv">${streakOwner?streakLen+' in a row':'No streak'}</div>
+        <div class="h2hcd">${streakOwner?`<b>${streakOwner.full.split(' ')[0]}</b> has won ${streakLen} straight. ${streakLen>=4?fl+' needs to look in the mirror.':streakLen>=3?fl+' has no answer right now.':'The momentum has shifted.'}`:n<2?'Need more shared seasons.':'Alternating wins — no momentum.'}</div>
+      </div>
+
+      <div class="h2hcard ${momW?'cyan':''}">
+        <div class="h2hck">Momentum · Last ${mLen} Seasons</div>
+        <div class="h2hcv">${momW?momW.full.split(' ')[0]+' '+momWins+'–'+momLoss:'Level'}</div>
+        <div class="h2hcd">${momW?`<b>${momW.full.split(' ')[0]}</b> is winning the recent argument — ${momWins} of the last ${mLen} shared seasons.`:'Even-handed in recent seasons. No edge either way.'}</div>
+      </div>
+
+      <div class="h2hcard nasty">
+        <div class="h2hck">Biggest Humiliation · ${fa}</div>
+        <div class="h2hcv">${humA?'–'+fmt(humA)+' pts':'None'}</div>
+        <div class="h2hcd">${humA?`In <b>${humAS}</b>, <b>${fa}</b> was beaten by <b>${fmt(humA)} points</b> in a single season. Some results leave a mark.`:'No single-season hiding on record yet.'}</div>
+      </div>
+
+      <div class="h2hcard nasty">
+        <div class="h2hck">Biggest Humiliation · ${fb}</div>
+        <div class="h2hcv">${humB?'–'+fmt(humB)+' pts':'None'}</div>
+        <div class="h2hcd">${humB?`In <b>${humBS}</b>, <b>${fb}</b> was beaten by <b>${fmt(humB)} points</b> in a single season. Filed under: things we don't talk about.`:'No single-season hiding on record yet.'}</div>
+      </div>
+
+      <div class="h2hcard gold">
+        <div class="h2hck">World Rank Peak · ${fa}</div>
+        <div class="h2hcv">#${fmt(pkA)}</div>
+        <div class="h2hcd">Career best: <b>#${fmt(pkA)}</b> in <b>${pkAS}</b>. ${rankGrade(pkA)}</div>
+      </div>
+
+      <div class="h2hcard gold">
+        <div class="h2hck">World Rank Peak · ${fb}</div>
+        <div class="h2hcv">#${fmt(pkB)}</div>
+        <div class="h2hcd">Career best: <b>#${fmt(pkB)}</b> in <b>${pkBS}</b>. ${rankGrade(pkB)}</div>
+      </div>
+
+      ${trajCard}
+      ${fraudCard}
+
+    </div>
+
+    <div class="h2hrating">
+      <div class="ratttl">⚖️ Superiority Rating</div>
+      <div class="ratbody">
+        <div class="ratside">
+          <div class="ratnm">${fa}</div>
+          <div class="ratval ${supA>supB?'hi':'lo'}">${supA}</div>
+          <div class="ratbar"><div class="ratfill" style="width:${supA*10}%;background:${supA>supB?'linear-gradient(90deg,var(--lime),#00ff88)':'linear-gradient(90deg,var(--mag),#ff6b6b)'}"></div></div>
+        </div>
+        <div class="ratmid">/ 10</div>
+        <div class="ratside">
+          <div class="ratnm">${fb}</div>
+          <div class="ratval ${supB>supA?'hi':'lo'}">${supB}</div>
+          <div class="ratbar"><div class="ratfill" style="width:${supB*10}%;background:${supB>supA?'linear-gradient(90deg,var(--lime),#00ff88)':'linear-gradient(90deg,var(--mag),#ff6b6b)'}"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="h2htbl">
+      <div class="h2hr hd"><div>Season</div><div class="v">${fa}</div><div class="v">${fb}</div></div>
+      ${tableRows}
+    </div>
+
+    <div class="h2hverdict">
+      <div class="vtag">The Verdict</div>
+      <div class="vtxt">${vt}</div>
     </div>`;
 }
 
