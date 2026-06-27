@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset Maker — The XII Invitational</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#05070e;color:#eaf0ff;font-family:Inter,system-ui,sans-serif;padding:40px 20px;text-align:center}
+  h1{font-family:Anton,sans-serif;font-weight:400;letter-spacing:.5px;font-size:30px}
+  p{color:#8b97b5;max-width:620px;margin:10px auto 26px;line-height:1.6}
+  .asset{margin:30px auto;max-width:680px}
+  canvas{max-width:100%;height:auto;border:1px solid rgba(255,255,255,.14);border-radius:12px;display:block;margin:0 auto 14px}
+  .icons{display:flex;gap:30px;justify-content:center;flex-wrap:wrap}
+  button{font-family:Oswald,sans-serif;font-weight:600;letter-spacing:1px;text-transform:uppercase;font-size:14px;color:#04121a;background:linear-gradient(180deg,#00e9ff,#15b9cc);border:0;padding:13px 24px;border-radius:11px;cursor:pointer}
+  button:hover{transform:translateY(-2px)}
+  .lab{font-family:Oswald;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#637197;margin-bottom:10px}
+</style>
+</head>
+<body>
+  <h1>Share-image &amp; icon maker</h1>
+  <p>Open this once in a browser. Click each button to download <b>og-image.png</b>, <b>icon-512.png</b> and <b>icon-192.png</b>, then drop all three next to <b>index.html</b>. (They're what makes the link unfurl with a rich preview and gives the app a proper icon.)</p>
+
+  <div class="asset">
+    <div class="lab">Social share image · 1200 × 630</div>
+    <canvas id="og" width="1200" height="630"></canvas>
+    <button onclick="dl('og','og-image.png')">⬇ Download og-image.png</button>
+  </div>
+
+  <div class="icons">
+    <div class="asset">
+      <div class="lab">Icon · 512</div>
+      <canvas id="i512" width="512" height="512" style="max-width:200px"></canvas><br>
+      <button onclick="dl('i512','icon-512.png')">⬇ icon-512.png</button>
+    </div>
+    <div class="asset">
+      <div class="lab">Icon · 192</div>
+      <canvas id="i192" width="192" height="192" style="max-width:140px"></canvas><br>
+      <button onclick="dl('i192','icon-192.png')">⬇ icon-192.png</button>
+    </div>
+  </div>
+
+<script>
+function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath();}
+// premium heraldic shield: gold gradient, bevel, sheen, serif XII
+function shieldPath(x){x.beginPath();x.moveTo(24,2.5);x.lineTo(44,9);x.lineTo(44,27);x.bezierCurveTo(44,39,35,48,24,52);x.bezierCurveTo(13,48,4,39,4,27);x.lineTo(4,9);x.closePath();}
+function shield(x,cx,cy,s){
+  const k=s/48; x.save(); x.translate(cx-s/2,cy-(54*k)/2); x.scale(k,k);
+  // drop shadow
+  x.save();x.shadowColor='rgba(0,0,0,.45)';x.shadowBlur=10;x.shadowOffsetY=4;
+  shieldPath(x);const g=x.createLinearGradient(0,0,0,54);g.addColorStop(0,'#ffe98a');g.addColorStop(.45,'#ffce3a');g.addColorStop(1,'#d99a0e');x.fillStyle=g;x.fill();x.restore();
+  // clip for inner detailing
+  x.save();shieldPath(x);x.clip();
+  // top sheen
+  x.fillStyle='rgba(255,255,255,.30)';x.beginPath();x.moveTo(4,9);x.lineTo(44,9);x.lineTo(44,19);x.bezierCurveTo(30,24,18,24,4,19);x.closePath();x.fill();
+  // bottom shade
+  x.fillStyle='rgba(120,70,0,.28)';x.fillRect(4,33,40,20);
+  x.restore();
+  // outer rim
+  shieldPath(x);x.lineWidth=1.6;x.strokeStyle='rgba(255,255,255,.55)';x.stroke();
+  // inner hairline ring
+  x.save();x.translate(24,27.5);x.scale(.8,.8);x.translate(-24,-27.5);shieldPath(x);x.lineWidth=1.1;x.strokeStyle='rgba(90,55,0,.45)';x.stroke();x.restore();
+  // serif roman numerals
+  x.fillStyle='#43320a';x.font='800 16px Georgia,"Times New Roman",serif';x.textAlign='center';x.textBaseline='middle';
+  x.fillText('XII',24,29);
+  x.restore();
+}
+function drawOG(){
+  const c=document.getElementById('og'),x=c.getContext('2d'),W=1200,H=630,M=78;
+  // base
+  let bg=x.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#0d1628');bg.addColorStop(.55,'#070c17');bg.addColorStop(1,'#04060c');x.fillStyle=bg;x.fillRect(0,0,W,H);
+  // glows
+  let g1=x.createRadialGradient(W*.86,H*.08,40,W*.86,H*.08,680);g1.addColorStop(0,'rgba(255,206,58,.22)');g1.addColorStop(1,'transparent');x.fillStyle=g1;x.fillRect(0,0,W,H);
+  let g2=x.createRadialGradient(W*.04,H*.98,40,W*.04,H*.98,640);g2.addColorStop(0,'rgba(0,233,255,.15)');g2.addColorStop(1,'transparent');x.fillStyle=g2;x.fillRect(0,0,W,H);
+  // grid
+  x.strokeStyle='rgba(255,255,255,.035)';x.lineWidth=1;for(let g=0;g<W;g+=50){x.beginPath();x.moveTo(g,0);x.lineTo(g,H);x.stroke();}for(let g=0;g<H;g+=50){x.beginPath();x.moveTo(0,g);x.lineTo(W,g);x.stroke();}
+  // giant faint XII watermark
+  x.save();x.font='800 560px Georgia,serif';x.textAlign='right';x.textBaseline='middle';x.fillStyle='rgba(255,255,255,.032)';x.fillText('XII',W+50,H*.54);x.restore();
+  // vignette
+  let vg=x.createRadialGradient(W/2,H/2,H*.32,W/2,H/2,W*.78);vg.addColorStop(0,'transparent');vg.addColorStop(1,'rgba(0,0,0,.55)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+  // gold inset border
+  x.strokeStyle='rgba(255,206,58,.32)';x.lineWidth=2;rr(x,26,26,W-52,H-52,20);x.stroke();
+  // crest + kicker
+  shield(x,M+36,108,78);
+  try{x.letterSpacing='3px';}catch(e){}
+  x.textAlign='left';x.textBaseline='middle';
+  x.fillStyle='#ffce3a';x.font='600 23px Oswald,sans-serif';x.fillText('THE PUNDITS GROUP',M+96,98);
+  try{x.letterSpacing='0px';}catch(e){}
+  x.fillStyle='#8b97b5';x.font='500 19px Oswald,sans-serif';x.fillText('Fantasy Premier League · Hall of Fame',M+96,127);
+  // THE XII
+  x.textBaseline='alphabetic';
+  x.fillStyle='#fff';x.font='148px Anton,sans-serif';x.fillText('THE XII',M-4,300);
+  // INVITATIONAL — sized way up, gold gradient
+  let ig=x.createLinearGradient(M,326,M,404);ig.addColorStop(0,'#ffe98a');ig.addColorStop(1,'#d99a0e');
+  x.fillStyle=ig;x.font='98px Anton,sans-serif';x.fillText('INVITATIONAL',M,400);
+  // divider
+  x.strokeStyle='rgba(255,255,255,.13)';x.lineWidth=2;x.beginPath();x.moveTo(M,440);x.lineTo(M+600,440);x.stroke();
+  // tagline
+  x.fillStyle='#eaf0ff';x.font='italic 600 46px Oswald,sans-serif';x.fillText("You've been called up.",M,498);
+  // sub
+  x.fillStyle='#637197';x.font='500 25px Oswald,sans-serif';x.fillText('Twelve years of bragging rights · one Hall of Fame · 2026/27',M,548);
+}
+function drawIcon(id,size){
+  const c=document.getElementById(id),x=c.getContext('2d');
+  // rich dark bg (full-bleed for maskable)
+  let bg=x.createLinearGradient(0,0,size,size);bg.addColorStop(0,'#12233f');bg.addColorStop(1,'#05070e');x.fillStyle=bg;x.fillRect(0,0,size,size);
+  let r=x.createRadialGradient(size*.5,size*.34,size*.04,size*.5,size*.34,size*.72);r.addColorStop(0,'rgba(255,206,58,.20)');r.addColorStop(1,'transparent');x.fillStyle=r;x.fillRect(0,0,size,size);
+  shield(x,size/2,size*0.52,size*0.62);
+}
+function dl(id,name){const c=document.getElementById(id);c.toBlob(b=>{const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);});}
+(async()=>{ try{await document.fonts.ready;}catch(e){} drawOG();drawIcon('i512',512);drawIcon('i192',192); })();
+</script>
+</body>
+</html>
