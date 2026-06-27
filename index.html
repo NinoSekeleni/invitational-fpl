@@ -248,6 +248,23 @@ select:focus,.searchbox:focus{border-color:var(--cyan)}
 .h2hscope{display:inline-block;font-family:'Oswald';font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);border:1px solid var(--line2);background:rgba(255,255,255,.03);border-radius:100px;padding:6px 13px;margin-bottom:14px}
 .h2hscope b{color:var(--cyan);font-weight:600}
 @media(max-width:560px){.h2hstats{grid-template-columns:1fr}.ratval{font-size:46px}}
+/* ---------- trophy room ---------- */
+.troom-grp{margin-bottom:26px}
+.troom-h{font-family:'Oswald';font-weight:600;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.troomgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.troom{border:1px solid var(--line2);border-radius:14px;padding:16px 18px;background:linear-gradient(180deg,var(--panel2),var(--panel));position:relative;overflow:hidden}
+.troom.gold{border-color:rgba(255,206,58,.3);background:linear-gradient(135deg,rgba(255,206,58,.07),var(--panel))}
+.troom.marquee{border-color:rgba(255,255,255,.12)}
+.troom.cyan{border-color:rgba(0,233,255,.22);background:linear-gradient(135deg,rgba(0,233,255,.05),var(--panel))}
+.troom.spoon{border-color:rgba(255,46,126,.3);background:linear-gradient(135deg,rgba(255,46,126,.07),var(--panel))}
+.troom .ic{font-size:24px;margin-bottom:8px}
+.troom .tt{font-family:'Oswald';font-weight:600;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.troom .hold{font-family:'Oswald';font-weight:600;font-size:18px;color:#fff;line-height:1.25;margin-bottom:7px}
+.troom .dd{font-size:12px;color:var(--silver);line-height:1.5}
+.troom .dd b{color:#fff}
+.rollrow.skipped{cursor:default;opacity:.6}
+.rollrow.skipped:hover{background:none}
+.rollrow.skipped .rnm{color:var(--mut)}
 
 /* ---------- honours ---------- */
 .honours{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
@@ -688,41 +705,6 @@ footer .fupd{font-size:10.5px;color:var(--mut);letter-spacing:1px;text-transform
     </div>
   </section>
 
-  <section class="sec" id="replay">
-    <div class="sechead">
-      <div><div class="tag">The Climb</div><h2>Season Replay</h2></div>
-      <p>Press play and watch twelve years of cumulative points race by — names climbing, overtaking and crashing out of the top 12, season by season.</p>
-    </div>
-    <div class="replaybox">
-      <div class="replay-top">
-        <div class="ryear" id="ryear">2011/12</div>
-        <div class="rctrls">
-          <button class="rbtn" id="rplay">▶ Play</button>
-          <button class="rbtn ghost" id="rrestart">↻ Restart</button>
-          <input id="rscrub" type="range" min="0" max="14" value="0">
-        </div>
-      </div>
-      <div class="rtrack" id="rtrack"></div>
-      <div class="rfoot">Cumulative all-time points · every contestant · drag the slider to scrub through any season</div>
-    </div>
-  </section>
-
-  <section class="sec" id="spoon">
-    <div class="sechead">
-      <div><div class="tag">The Reckoning</div><h2>The Wooden Spoon</h2></div>
-      <p>Objectivity, not mercy. Ranked on <b style="color:var(--mag)">average points per season</b> across every campaign on file — the one measure that ignores how long you've played and just asks: how good, really?</p>
-    </div>
-    <div class="spoon" id="spoonwrap"></div>
-  </section>
-
-  <section class="sec" id="rivalries">
-    <div class="sechead">
-      <div><div class="tag">Bad Blood</div><h2>The Rivalries</h2></div>
-      <p>Auto-detected from the tightest head-to-heads across the Invitational era — the pairs separated by the finest margins.</p>
-    </div>
-    <div class="rivgrid" id="rivgrid"></div>
-  </section>
-
   <section class="sec" id="h2h">
     <div class="sechead">
       <div><div class="tag">Settle It</div><h2>Head to Head</h2></div>
@@ -736,12 +718,12 @@ footer .fupd{font-size:10.5px;color:var(--mut);letter-spacing:1px;text-transform
     <div id="h2hout"></div>
   </section>
 
-  <section class="sec" id="honours">
+  <section class="sec" id="trophyroom">
     <div class="sechead">
-      <div><div class="tag">The Record Books</div><h2>Honours &amp; Records</h2></div>
-      <p>All-time superlatives across every season on file, 2011/12 to 2025/26.</p>
+      <div><div class="tag">The Record Books</div><h2>The Trophy Room</h2></div>
+      <p>Every award in the league and exactly who owns it — crowns, all-time records, milestone clubs, founding honours and the one nobody wants.</p>
     </div>
-    <div class="honours" id="honours"></div>
+    <div id="trophyroomout"></div>
   </section>
 
 </main>
@@ -812,16 +794,20 @@ footer .fupd{font-size:10.5px;color:var(--mut);letter-spacing:1px;text-transform
   <header class="hero"><div class="wrap">
     <div class="kicker">★ Roll of Honour ★</div>
     <h1>The<br><span class="glow">Champions</span></h1>
-    <p class="sub">Eleven seasons, eleven crowns. The manager who topped the Invitational each year — not the all-time points list, but who actually <b>won the league</b> that season, settled among the members who were in at the time.</p>
+    <p class="sub">Two competitions, one league. The <b>Classic League</b> crowns whoever tops the table each season; the <b>Head-to-Head League</b> rewards week-by-week results. Here is every winner of both.</p>
   </div></header>
   <main class="wrap">
     <section class="sec">
+      <div class="sechead"><div><div class="tag">The Classic League</div><h2>League Champions</h2></div>
+        <p>Who actually <b>won the league</b> each season — not the all-time points list, but the top member among those in at the time.</p></div>
       <div class="hofstats" id="hofstats"></div>
+      <div class="rollwrap" id="rollwrap" style="margin-top:18px"></div>
     </section>
     <section class="sec">
-      <div class="sechead"><div><div class="tag">Season by Season</div><h2>Every Crown</h2></div>
-        <p>Newest first. Tap a champion to open their full profile.</p></div>
-      <div class="rollwrap" id="rollwrap"></div>
+      <div class="sechead"><div><div class="tag">The Head-to-Head League</div><h2>H2H Champions</h2></div>
+        <p>FPL's other format — managers drawn against each other each gameweek, three points a win. It ran alongside the Classic League and deserves its own crowns.</p></div>
+      <div class="hofstats" id="h2hhofstats"></div>
+      <div class="rollwrap" id="h2hrollwrap" style="margin-top:18px"></div>
     </section>
   </main>
 </section>
@@ -949,6 +935,19 @@ const CHAMPIONS=[
   ["2025/26","Azi"],["2024/25","Azi"],["2023/24","JL van Niekerk"],["2022/23","Daniel"],
   ["2021/22","David"],["2020/21","David"],["2019/20","Kennan"],["2018/19","Msash"],
   ["2017/18","Nino"],["2016/17","Khaka"],["2015/16","Aphiwe"]
+];
+/* FPL Head-to-Head league winners. [season, name|null if not contested, H2H points]. Newest first. */
+const H2H_CHAMPIONS=[
+  ["2025/26",null,null],
+  ["2024/25","MT",70],
+  ["2023/24","Tunechi",93],
+  ["2022/23","Daniel",88],
+  ["2021/22","David",77],
+  ["2020/21","David",81],
+  ["2019/20","Nino",77],
+  ["2018/19","Kennan",88],
+  ["2017/18","Nino",78],
+  ["2016/17","Kennan",81]
 ];
 
 const ALLSEASONS=["2011/12","2012/13","2013/14","2014/15","2015/16","2016/17","2017/18","2018/19","2019/20","2020/21","2021/22","2022/23","2023/24","2024/25","2025/26"];
@@ -1270,85 +1269,65 @@ function renderRows(arr,seasons){
   document.querySelectorAll('.brow').forEach(r=>r.onclick=()=>openProfile(r.dataset.nm));
 }
 
-function renderRivalries(){
-  const rivs=detectRivalries();
-  document.getElementById('rivgrid').innerHTML=rivs.map((r,i)=>{
-    const lead=r.ta>=r.tb?'A':'B';
-    const ca=CLUBS[r.A.club],cb=CLUBS[r.B.club];
-    const rtitle = r.fam ? "The Family Derby" : RIV_TITLES[i%RIV_TITLES.length];
-    return `<div class="riv fade">
-      <div class="rtitle">${rtitle}${r.fam?`<span class="fam">SAME BLOOD</span>`:''}</div>
-      <div class="vsrow">
-        <div class="side ${lead==='A'?'lead':''}" style="background:linear-gradient(180deg,${ca.c}14,transparent)">
-          <div class="bw">${clubBadge(r.A.club,26)}</div><div class="nm">${r.A.full}</div><div class="cl">${r.A.club}</div><div class="pt">${fmt(r.ta)}</div>
-        </div>
-        <div class="mid">VS</div>
-        <div class="side ${lead==='B'?'lead':''}" style="background:linear-gradient(180deg,${cb.c}14,transparent)">
-          <div class="bw">${clubBadge(r.B.club,26)}</div><div class="nm">${r.B.full}</div><div class="cl">${r.B.club}</div><div class="pt">${fmt(r.tb)}</div>
-        </div>
-      </div>
-      <div class="rcopy">${rivalryCopy(r,i)}</div>
-      <div class="rmeta">
-        <div>Shared seasons<b>${r.common.length}</b></div>
-        <div>Points gap<b>${fmt(r.gap)}</b></div>
-        <div>Lead swings<b>${r.leadChanges}</b></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function renderHonours(){
+function renderTrophyRoom(){
   const all=PLAYERS.map(p=>({p,...statsFor(p,ALLSEASONS)}));
-  // peak single season
-  let peak={v:0};all.forEach(o=>{if(o.peakP>peak.v)peak={v:o.peakP,p:o.p,s:o.peakSzn};});
-  // best world rank ever
-  let brank={v:Infinity};all.forEach(o=>{if(o.best!=null&&o.best<brank.v)brank={v:o.best,p:o.p,s:o.bestSzn};});
-  // most seasons
-  let mostS=[...all].sort((a,b)=>b.cnt-a.cnt)[0];
-  // highest all-time total
-  let topTot=[...all].sort((a,b)=>b.tot-a.tot)[0];
-  // best average (min 4 seasons)
-  let bestAvg=[...all].filter(o=>o.cnt>=4).sort((a,b)=>b.avg-a.avg)[0];
-  // biggest single-year climb
-  let climb={v:0};all.forEach(o=>{const pl=Object.keys(o.p.s).sort();for(let i=1;i<pl.length;i++){const d=o.p.s[pl[i]][0]-o.p.s[pl[i-1]][0];if(d>climb.v)climb={v:d,p:o.p,s:pl[i]};}});
-  const cards=[
-    ["🏆","Most Points (All-Time)",topTot.p.full,`${fmt(topTot.tot)} pts`,`${topTot.cnt} seasons of relentless accumulation — the benchmark everyone else is chasing.`],
-    ["🎯","Best World Rank Ever",brank.p.full,`#${fmt(brank.v)} in ${brank.s}`,`Out of millions worldwide. The single finest season the group has ever produced.`],
-    ["💥","Highest Single Season",peak.p.full,`${fmt(peak.v)} pts · ${peak.s}`,`The biggest one-season haul on record across twelve years of data.`],
-    ["⏳","Most Seasons Played",mostS.p.full,`${mostS.cnt} seasons`,`On the team-sheet longer than anyone — a true fixture of the format.`],
-    ["📐","Best Average / Season",bestAvg.p.full,`${fmt(bestAvg.avg)} pts/szn`,`Pound-for-pound the most consistent return, min. four seasons played.`],
-    ["🚀","Biggest Year-on-Year Jump",climb.p.full,`+${climb.v} into ${climb.s}`,`The steepest single-season improvement anyone has managed.`]
-  ];
-  document.getElementById('honours').innerHTML=cards.map(c=>`<div class="hon"><div class="ic">${c[0]}</div><div class="ht">${c[1]}</div><div class="hn">${c[2]}</div><div class="hv">${c[3]}</div><div class="hd">${c[4]}</div></div>`).join('');
-}
+  const fullOf=n=>{const p=PLAYERS.find(x=>x.name===n);return p?p.full:n;};
+  const firstOf=n=>fullOf(n).split(' ')[0];
 
-function renderWoodenSpoon(){
-  const all=PLAYERS.map(p=>({p,...statsFor(p,ALLSEASONS)})).filter(o=>o.cnt>0).sort((a,b)=>a.avg-b.avg);
-  const worst=all[0], bottom=all.slice(0,3);
-  const played=Object.keys(worst.p.s).sort();
-  let wp=Infinity,wps=null,wr=0,wrs=null;
-  played.forEach(s=>{const[pt,rk]=worst.p.s[s];if(pt<wp){wp=pt;wps=s;}if(rk>wr){wr=rk;wrs=s;}});
-  const leagueAvg=Math.round(all.reduce((a,o)=>a+o.avg,0)/all.length);
-  const fn=worst.p.full.split(' ')[0];
-  document.getElementById('spoonwrap').innerHTML=`
-    <div class="spoon-top">
-      <div class="spoon-ic">🥄</div>
-      <div class="spoon-lead">
-        <div class="lab">The Wooden Spoon · objectively last by average</div>
-        <div class="nm">${clubBadge(worst.p.club,32)} ${worst.p.full}</div>
-        <div class="desc">Across <b>${worst.cnt}</b> seasons, ${fn} averages just <b>${fmt(worst.avg)}</b> points a year — <b>${fmt(leagueAvg-worst.avg)}</b> below the group mean and dead last of <b>${all.length}</b>. The commitment is genuinely respected; the returns, measured fairly, are the league's most modest. Someone has to hold the spoon — and there's a whole career left to hand it on.</div>
-      </div>
-      <div class="spoon-num"><div class="n">${fmt(worst.avg)}</div><div class="l">avg pts / season</div></div>
-    </div>
-    <div class="spoon-zone">
-      ${bottom.map((o,i)=>`<div class="sz ${i===0?'worst':''}"><div class="pos">${i===0?'🥄':all.length-i}</div>${clubBadge(o.p.club,22)}<div><div class="nm">${o.p.full}</div><div class="mt">${fmt(o.avg)} avg · ${o.cnt} szns</div></div></div>`).join('')}
-    </div>
-    <div class="spoon-evidence">
-      <div><div class="k">Worst single season</div><div class="v">${fmt(wp)} · ${wps}</div></div>
-      <div><div class="k">Lowest world rank</div><div class="v">${fmt(wr)}</div></div>
-      <div><div class="k">Seasons played</div><div class="v">${worst.cnt}</div></div>
-      <div><div class="k">Below group avg</div><div class="v">−${fmt(leagueAvg-worst.avg)}</div></div>
-    </div>`;
+  // ----- superlatives -----
+  let peak={v:0};all.forEach(o=>{if(o.peakP>peak.v)peak={v:o.peakP,p:o.p,s:o.peakSzn};});
+  let brank={v:Infinity};all.forEach(o=>{if(o.best!=null&&o.best<brank.v)brank={v:o.best,p:o.p,s:o.bestSzn};});
+  let mostS=[...all].sort((a,b)=>b.cnt-a.cnt)[0];
+  let topTot=[...all].sort((a,b)=>b.tot-a.tot)[0];
+  let bestAvg=[...all].filter(o=>o.cnt>=4).sort((a,b)=>b.avg-a.avg)[0];
+  let climb={v:0};all.forEach(o=>{const pl=Object.keys(o.p.s).sort();for(let i=1;i<pl.length;i++){const d=o.p.s[pl[i]][0]-o.p.s[pl[i-1]][0];if(d>climb.v)climb={v:d,p:o.p,s:pl[i]};}});
+  let worst=[...all].filter(o=>o.cnt>0).sort((a,b)=>a.avg-b.avg)[0];
+
+  // ----- crowns: tally titles, list holders by count desc then alpha -----
+  const tallyList=(arr)=>{const t={};arr.forEach(([,n])=>{if(n)t[n]=(t[n]||0)+1;});
+    return Object.keys(t).sort((a,b)=>t[b]-t[a]||fullOf(a).localeCompare(fullOf(b)))
+      .map(n=>`${firstOf(n)} ×${t[n]}`).join(' · ');};
+  const classicHolders=tallyList(CHAMPIONS);
+  const h2hHolders=tallyList(H2H_CHAMPIONS);
+
+  // ----- founding honours -----
+  const founder=PLAYERS.find(p=>p.founder);
+  const founding=PLAYERS.filter(p=>p.debut==='2015/16'&&!p.founder).map(p=>p.full.split(' ')[0]).sort();
+
+  // ----- milestone clubs -----
+  const sub100=PLAYERS.filter(p=>Object.values(p.s).some(([,rk])=>rk<100000)).map(p=>p.full.split(' ')[0]).sort();
+  const club2400=PLAYERS.filter(p=>Object.values(p.s).some(([pt])=>pt>=2400)).map(p=>p.full.split(' ')[0]).sort();
+
+  const card=(cls,ic,title,holder,desc)=>`<div class="troom ${cls}"><div class="ic">${ic}</div><div class="tt">${title}</div><div class="hold">${holder}</div><div class="dd">${desc}</div></div>`;
+  const group=(name,cards)=>`<div class="troom-grp"><div class="troom-h">${name}</div><div class="troomgrid">${cards.join('')}</div></div>`;
+
+  const html=[
+    group('The Crowns',[
+      card('gold','🏅','Classic League Champions',classicHolders,`${CHAMPIONS.length} seasons crowned. Topping the table is the headline act.`),
+      card('gold','🤝','Head-to-Head Champions',h2hHolders,`The week-by-week format. Different game, same bragging rights.`)
+    ]),
+    group('All-Time Superlatives',[
+      card('marquee','🏆','Most Points · All-Time',topTot.p.full,`<b>${fmt(topTot.tot)} pts</b> over ${topTot.cnt} seasons — the benchmark everyone is chasing.`),
+      card('marquee','🎯','Best World Rank Ever',brank.p.full,`<b>#${fmt(brank.v)}</b> in ${brank.s}. Out of millions — the finest season the group has produced.`),
+      card('marquee','💥','Highest Single Season',peak.p.full,`<b>${fmt(peak.v)} pts</b> in ${peak.s}. The biggest one-season haul on record.`),
+      card('marquee','⏳','Most Seasons Played',mostS.p.full,`<b>${mostS.cnt} seasons</b> on the team-sheet — a true fixture of the format.`),
+      card('marquee','📐','Best Average / Season',bestAvg.p.full,`<b>${fmt(bestAvg.avg)} pts/szn</b>, min. four seasons. Pound-for-pound the most reliable.`),
+      card('marquee','🚀','Biggest Year-on-Year Jump',climb.p.full,`<b>+${fmt(climb.v)}</b> into ${climb.s}. The steepest single-season leap anyone has managed.`)
+    ]),
+    group('Founding Honours',[
+      card('cyan','👑','Founder & Commissioner',founder?founder.full:'—',`Started the whole thing and still runs it.`),
+      card('cyan','🎖️','Founding Members',founding.length?founding.join(' · '):'—',`In from the very first season, 2015/16. The originals.`)
+    ]),
+    group('Milestone Clubs',[
+      card('','🌍','The Sub-100k Club',sub100.length?sub100.join(' · '):'—',`Have finished a season inside the global top 100,000 at least once.`),
+      card('','⚡','The 2,400+ Club',club2400.length?club2400.join(' · '):'—',`Have posted a 2,400-point season — elite territory.`)
+    ]),
+    group('And One Nobody Wants',[
+      card('spoon','🥄','The Wooden Spoon',worst.p.full,`Objectively last by average — <b>${fmt(worst.avg)} pts/szn</b> across ${worst.cnt} seasons. Respect the commitment.`)
+    ])
+  ].join('');
+
+  document.getElementById('trophyroomout').innerHTML=html;
 }
 
 /* ---- count-up animation ---- */
@@ -1416,7 +1395,9 @@ function playerTrophies(p){
   const t=[];const n=p.name;
   if(p.founder)t.push(['👑','Founder & Commissioner']);
   const titles=CHAMPIONS.filter(c=>c[1]===n).map(c=>c[0]);
-  if(titles.length)t.push(['🏅',`Invitational Champion ×${titles.length}`]);
+  if(titles.length)t.push(['🏅',`Classic League Champion ×${titles.length}`]);
+  const h2hTitles=H2H_CHAMPIONS.filter(c=>c[1]===n).map(c=>c[0]);
+  if(h2hTitles.length)t.push(['🤝',`H2H League Champion ×${h2hTitles.length}`]);
   if(G.topTot.p.name===n)t.push(['🏆','All-Time No.1']);
   if(G.bestRk.p.name===n)t.push(['🎯','Best World Rank Ever']);
   if(G.peak.p.name===n)t.push(['💥','Highest Single Season']);
@@ -1575,38 +1556,6 @@ async function downloadCard(p,btn){
 }
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 
-/* ---- season replay (bar-chart race) ---- */
-const REPLAY_TOPN=99; // show every contestant
-let replayNodes={},replayStep=0,replayTimer=null;
-function cumAt(p,idx){let t=0;for(let i=0;i<=idx;i++){const s=ALLSEASONS[i];if(p.s[s])t+=p.s[s][0];}return t;}
-function setupReplay(){
-  const track=document.getElementById('rtrack');track.innerHTML='';replayNodes={};
-  PLAYERS.forEach(p=>{const cl=CLUBS[p.club];const el=document.createElement('div');el.className='rbar';
-    el.innerHTML=`<div class="rbar-fill" style="background:linear-gradient(90deg,${cl.g},${cl.c})"></div><div class="rbar-lbl">${clubBadge(p.club,18)}<span class="rbar-nm">${p.full}</span></div><div class="rbar-val">0</div>`;
-    el.style.opacity='0';track.appendChild(el);replayNodes[p.name]=el;});
-  const scrub=document.getElementById('rscrub');scrub.max=ALLSEASONS.length-1;
-  scrub.oninput=()=>{pauseReplay();renderReplayStep(+scrub.value);};
-  document.getElementById('rplay').onclick=toggleReplay;
-  document.getElementById('rrestart').onclick=()=>{pauseReplay();renderReplayStep(0);};
-  renderReplayStep(0);
-}
-function renderReplayStep(idx){
-  replayStep=idx;document.getElementById('ryear').textContent=ALLSEASONS[idx];document.getElementById('rscrub').value=idx;
-  const vals=PLAYERS.map(p=>({p,v:cumAt(p,idx)})).filter(o=>o.v>0).sort((a,b)=>b.v-a.v);
-  const max=vals.length?vals[0].v:1,rowH=28,gap=4,top=vals.slice(0,REPLAY_TOPN);
-  const inTop=new Set(top.map(o=>o.p.name));
-  top.forEach((o,i)=>{const el=replayNodes[o.p.name];el.style.opacity='1';el.style.transform=`translateY(${i*(rowH+gap)}px)`;el.querySelector('.rbar-fill').style.width=Math.max(4,(o.v/max)*100)+'%';el.querySelector('.rbar-val').textContent=fmt(o.v);});
-  PLAYERS.forEach(p=>{if(!inTop.has(p.name)){const el=replayNodes[p.name];el.style.opacity='0';el.style.transform=`translateY(${REPLAY_TOPN*(rowH+gap)}px)`;}});
-  document.getElementById('rtrack').style.height=(Math.max(1,top.length)*(rowH+gap))+'px';
-}
-function toggleReplay(){replayTimer?pauseReplay():playReplay();}
-function playReplay(){
-  if(replayStep>=ALLSEASONS.length-1)renderReplayStep(0);
-  document.getElementById('rplay').textContent='⏸ Pause';
-  replayTimer=setInterval(()=>{if(replayStep>=ALLSEASONS.length-1){pauseReplay();return;}renderReplayStep(replayStep+1);},1300);
-}
-function pauseReplay(){clearInterval(replayTimer);replayTimer=null;document.getElementById('rplay').textContent=replayStep>=ALLSEASONS.length-1?'↻ Replay':'▶ Play';}
-
 function renderAll(){
   renderSeg();
   const {arr,seasons}=leaderboard(MODE,METRIC);
@@ -1735,7 +1684,35 @@ function renderChampions(){
       <div class="rpts">${pts!=null?fmt(pts)+' pts':''}${rk!=null?`<small>rank ${fmt(rk)}</small>`:''}</div>
     </div>`;
   }).join('');
-  document.querySelectorAll('.rollrow[data-nm]').forEach(r=>r.onclick=()=>openProfile(r.dataset.nm));
+  document.querySelectorAll('#rollwrap .rollrow[data-nm]').forEach(r=>r.onclick=()=>openProfile(r.dataset.nm));
+}
+
+function renderH2HChampions(){
+  const contested=H2H_CHAMPIONS.filter(c=>c[1]);
+  const tally={};contested.forEach(([,n])=>tally[n]=(tally[n]||0)+1);
+  const mostN=Math.max(...Object.values(tally));
+  const leaders=Object.keys(tally).filter(n=>tally[n]===mostN);
+  const fullOf=n=>{const p=PLAYERS.find(x=>x.name===n);return p?p.full:n;};
+  const reign=contested[0];                       // most recent contested season
+  const reignP=PLAYERS.find(p=>p.name===reign[1]);
+  const distinct=Object.keys(tally).length;
+  document.getElementById('h2hhofstats').innerHTML=[
+    ['👑','Reigning H2H champion',reignP?reignP.full:reign[1],`won ${reign[0]} · ${reign[2]} pts`],
+    ['🤝','Most H2H titles',leaders.map(n=>fullOf(n).split(' ')[0]).join(' & '),`${leaders.length>1?'tied on ':''}${mostN} each`],
+    ['📜','Seasons contested',String(contested.length),'of head-to-head'],
+    ['🧑‍🤝‍🧑','Different winners',String(distinct),'have topped it']
+  ].map(c=>`<div class="dcard"><div class="di">${c[0]}</div><div class="dk">${c[1]}</div><div class="dv">${c[2]}</div><div class="ds">${c[3]}</div></div>`).join('');
+
+  document.getElementById('h2hrollwrap').innerHTML=H2H_CHAMPIONS.map(([szn,name,pts])=>{
+    if(!name)return `<div class="rollrow skipped"><div class="rsz">${szn}</div><div class="rwho"><div><div class="rnm">Not contested</div><div class="rcl">Head-to-head league skipped this season</div></div></div><div class="rpts"></div></div>`;
+    const p=PLAYERS.find(x=>x.name===name), isReign=szn===reign[0];
+    return `<div class="rollrow ${isReign?'reign':''}" ${p?`data-nm="${p.name}"`:''}>
+      <div class="rsz">${szn}${isReign?'<span class="reignbadge">Reigning</span>':''}</div>
+      <div class="rwho">${p?clubBadge(p.club,30):''}<div><div class="rnm">${p?p.full:name}</div><div class="rcl">${p?p.club:''}</div></div></div>
+      <div class="rpts">${fmt(pts)} pts<small>head-to-head</small></div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('#h2hrollwrap .rollrow[data-nm]').forEach(r=>r.onclick=()=>openProfile(r.dataset.nm));
 }
 
 /* ============================ RULES ============================ */
@@ -1784,18 +1761,13 @@ function renderRegister(){
 
 /* ============================ HEAD TO HEAD ============================ */
 function fillH2HSelects(){
-  const opts=PLAYERS.map(p=>`<option value="${p.name}">${p.full}</option>`).join('');
+  const sorted=[...PLAYERS].sort((x,y)=>x.full.localeCompare(y.full)); // alphabetical for easy finding
+  const opts=sorted.map(p=>`<option value="${p.name}">${p.full}</option>`).join('');
   const a=document.getElementById('h2hA'),b=document.getElementById('h2hB');
   a.innerHTML=opts;b.innerHTML=opts;
-  a.value=PLAYERS[0].name;b.value=PLAYERS[1]?PLAYERS[1].name:PLAYERS[0].name;
+  a.value=sorted[0].name;b.value=sorted[1]?sorted[1].name:sorted[0].name;
   a.onchange=renderH2H;b.onchange=renderH2H;
   renderH2H();
-}
-function h2hSupRating(winRate,avgGapForPlayer,avgRankShared){
-  const winScore=winRate*5;
-  const gapScore=Math.max(-2,Math.min(2,avgGapForPlayer/150));
-  const rankScore=Math.max(0,(1-avgRankShared/3000000))*2.5;
-  return Math.max(1,Math.min(10,2.5+winScore+gapScore+rankScore)).toFixed(1);
 }
 // seasons in play for the comparator, following the active leaderboard filter (MODE)
 function h2hSeasons(A,B){
@@ -1812,6 +1784,34 @@ function renderH2H(){
   if(A===B){out.innerHTML=scopeChip+`<div class="h2hempty">Pick two different managers to compare.</div>`;return;}
   const common=h2hSeasons(A,B);
   if(!common.length){out.innerHTML=scopeChip+`<div class="h2hempty"><b>${A.full}</b> and <b>${B.full}</b> have no overlapping seasons in this view. Try switching the filter to <b>All-Time</b> or <b>The Invitational</b>.</div>`;return;}
+
+  // ---- single season: most metrics are meaningless over one year, so show a focused result ----
+  if(common.length===1){
+    const s=common[0],[pa,rka]=A.s[s],[pb,rkb]=B.s[s];
+    const draw=pa===pb,aw=pa>pb,Wp=aw?A:B,Lp=aw?B:A,marg=Math.abs(pa-pb);
+    const v1=draw
+      ? `Dead level in <b>${s}</b> — <b>${fmt(pa)}</b> points each. Switch to <b>The Invitational</b> or <b>All-Time</b> to settle it over more seasons.`
+      : `In <b>${s}</b>, <b>${Wp.full}</b> beat <b>${Lp.full.split(' ')[0]}</b> by <b>${fmt(marg)}</b> points. One season, one result — switch the filter for the bigger picture.`;
+    out.innerHTML=scopeChip+`
+      <div class="riv" style="margin-bottom:16px">
+        <div class="vsrow">
+          <div class="side ${aw&&!draw?'lead':''}"><div class="nm">${A.full}</div><div class="cl">${A.club}</div><div class="pt">${fmt(pa)}</div></div>
+          <div class="mid">VS</div>
+          <div class="side ${!aw&&!draw?'lead':''}"><div class="nm">${B.full}</div><div class="cl">${B.club}</div><div class="pt">${fmt(pb)}</div></div>
+        </div>
+        <div class="rmeta">
+          <div>Season<b>${s}</b></div>
+          <div>Margin<b>${draw?'Level':fmt(marg)+' pts'}</b></div>
+          <div>Result<b>${draw?'Draw':Wp.full.split(' ')[0]+' win'}</b></div>
+        </div>
+      </div>
+      <div class="h2hstats">
+        <div class="h2hcard"><div class="h2hck">${A.full.split(' ')[0]} · ${s}</div><div class="h2hcv">${fmt(pa)} pts</div><div class="h2hcd">Finished the season at world rank <b>#${fmt(rka)}</b>.</div></div>
+        <div class="h2hcard"><div class="h2hck">${B.full.split(' ')[0]} · ${s}</div><div class="h2hcv">${fmt(pb)} pts</div><div class="h2hcd">Finished the season at world rank <b>#${fmt(rkb)}</b>.</div></div>
+      </div>
+      <div class="h2hverdict"><div class="vtag">The Verdict</div><div class="vtxt">${v1}</div></div>`;
+    return;
+  }
 
   // core accumulation
   let ta=0,tb=0,wa=0,wb=0,sumRkA=0,sumRkB=0;
@@ -1884,8 +1884,14 @@ function renderH2H(){
   const rankGapPct=Math.round(Math.abs(avgRkA-avgRkB)/Math.max(avgRkA,avgRkB)*100);
 
   // superiority rating
-  const supA=+h2hSupRating(wa/n,(ta-tb)/n,avgRkA);
-  const supB=+h2hSupRating(wb/n,(tb-ta)/n,avgRkB);
+  // superiority rating — relative to THIS matchup, so the two scores contrast around 5.5
+  const decN=wa+wb;
+  const wrA=decN?wa/decN:.5, wrB=decN?wb/decN:.5;
+  const shA=(ta+tb)?ta/(ta+tb):.5, shB=(ta+tb)?tb/(ta+tb):.5;
+  const rbA=avgRkA<avgRkB?.4:(avgRkA>avgRkB?-.4:0), rbB=-rbA;
+  const clampR=x=>Math.max(1,Math.min(10,x));
+  const supA=+clampR(5.5+(wrA-.5)*6+(shA-.5)*8+rbA).toFixed(1);
+  const supB=+clampR(5.5+(wrB-.5)*6+(shB-.5)*8+rbB).toFixed(1);
 
   // verdict text
   let vt='';
@@ -2030,7 +2036,7 @@ function renderH2H(){
 /* init */
 document.getElementById('fupd').textContent='Last updated '+UPDATED;
 fillH2HSelects();
-renderStatStrip();renderSeasonPick();renderWoodenSpoon();renderRivalries();renderHonours();setupReplay();renderAll();renderDashboard();renderChampions();renderRules();renderRegister();renderCountdowns();setInterval(renderCountdowns,1000);wireTabs();
+renderStatStrip();renderSeasonPick();renderTrophyRoom();renderAll();renderDashboard();renderChampions();renderH2HChampions();renderRules();renderRegister();renderCountdowns();setInterval(renderCountdowns,1000);wireTabs();
 </script>
 </body>
 </html>
