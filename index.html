@@ -245,6 +245,8 @@ select:focus,.searchbox:focus{border-color:var(--cyan)}
 .vtag{font-family:'Oswald';font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-weight:700}
 .vtxt{font-size:15px;color:var(--silver);line-height:1.6}
 .vtxt b{color:#fff}
+.h2hscope{display:inline-block;font-family:'Oswald';font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);border:1px solid var(--line2);background:rgba(255,255,255,.03);border-radius:100px;padding:6px 13px;margin-bottom:14px}
+.h2hscope b{color:var(--cyan);font-weight:600}
 @media(max-width:560px){.h2hstats{grid-template-columns:1fr}.ratval{font-size:46px}}
 
 /* ---------- honours ---------- */
@@ -724,7 +726,7 @@ footer .fupd{font-size:10.5px;color:var(--mut);letter-spacing:1px;text-transform
   <section class="sec" id="h2h">
     <div class="sechead">
       <div><div class="tag">Settle It</div><h2>Head to Head</h2></div>
-      <p>Pick any two managers and compare their Invitational records — season by season, from when they were both in the league.</p>
+      <p>Pick any two managers and compare them head to head. The view follows the leaderboard filter above — switch between <b>The Invitational</b> and <b>All-Time</b> to change the seasons in play.</p>
     </div>
     <div class="h2hpick">
       <select id="h2hA"></select>
@@ -1612,6 +1614,7 @@ function renderAll(){
   renderAutoHeadline(arr);
   renderPodium(arr,seasons);
   renderRows(arr,seasons);
+  if(document.getElementById('h2hA'))renderH2H();
 }
 
 // metric buttons
@@ -1794,14 +1797,21 @@ function h2hSupRating(winRate,avgGapForPlayer,avgRankShared){
   const rankScore=Math.max(0,(1-avgRankShared/3000000))*2.5;
   return Math.max(1,Math.min(10,2.5+winScore+gapScore+rankScore)).toFixed(1);
 }
+// seasons in play for the comparator, following the active leaderboard filter (MODE)
+function h2hSeasons(A,B){
+  if(MODE==='inv')return sharedSeasons(A,B);                       // debut-aware Invitational overlap
+  return windowSeasons(MODE).filter(s=>A.s[s]&&B.s[s]);           // all-time / single season: raw overlap
+}
 function renderH2H(){
   const A=PLAYERS.find(p=>p.name===document.getElementById('h2hA').value);
   const B=PLAYERS.find(p=>p.name===document.getElementById('h2hB').value);
   const out=document.getElementById('h2hout');
   if(!A||!B){out.innerHTML='';return;}
-  if(A===B){out.innerHTML=`<div class="h2hempty">Pick two different managers to compare.</div>`;return;}
-  const common=sharedSeasons(A,B);
-  if(!common.length){out.innerHTML=`<div class="h2hempty"><b>${A.full}</b> and <b>${B.full}</b> haven't shared an Invitational season yet.</div>`;return;}
+  const scopeLabel={inv:'The Invitational · from each player\'s debut',all:'All-Time · full FPL history',this:'The 2025/26 season'}[MODE]||`The ${MODE} season`;
+  const scopeChip=`<div class="h2hscope">Comparing over: <b>${scopeLabel}</b></div>`;
+  if(A===B){out.innerHTML=scopeChip+`<div class="h2hempty">Pick two different managers to compare.</div>`;return;}
+  const common=h2hSeasons(A,B);
+  if(!common.length){out.innerHTML=scopeChip+`<div class="h2hempty"><b>${A.full}</b> and <b>${B.full}</b> have no overlapping seasons in this view. Try switching the filter to <b>All-Time</b> or <b>The Invitational</b>.</div>`;return;}
 
   // core accumulation
   let ta=0,tb=0,wa=0,wb=0,sumRkA=0,sumRkB=0;
@@ -1825,8 +1835,8 @@ function renderH2H(){
   const decisive=wa+wb;
   const domPct=decisive>0?(aLeads?wa:wb)/decisive*100:50;
 
-  // per gameweek gap
-  const perGW=(avgGap/38).toFixed(1);
+  // average margin per season (the leader's net points advantage in a typical season)
+  const avgMargin=Math.round(avgGap);
 
   // current streak
   let streakOwner=null,streakLen=0;
@@ -1880,10 +1890,10 @@ function renderH2H(){
   // verdict text
   let vt='';
   if(domPct>=80)vt=`<b>${W.full}</b> doesn't just win this matchup — they own it. ${domPct.toFixed(0)}% of decisive seasons, ${fmt(totalGap)} points clear. ${fl} has turned up. The data just doesn't care.`;
-  else if(domPct>=65)vt=`In ${n} shared seasons, <b>${W.full}</b> has been the better manager — and it's becoming a habit. ${fl} is still looking for an answer.`;
+  else if(domPct>=65)vt=`In ${n} shared season${n!==1?'s':''}, <b>${W.full}</b> has been the better manager — and it's becoming a habit. ${fl} is still looking for an answer.`;
   else if(domPct>=55)vt=`<b>${fw}</b> edges this one on points, but calling it a rivalry is fair. One strong campaign from ${fl} and this flips.`;
-  else if(ta===tb)vt=`A dead heat. ${n} seasons and they're level on total points. The Invitational doesn't give us a winner here — which is the most annoying possible result.`;
-  else vt=`${fmt(totalGap)} points across ${n} seasons. <b>${fw}</b> leads — but ${fl} refuses to accept it. This one stays alive.`;
+  else if(ta===tb)vt=`A dead heat. ${n} season${n!==1?'s':''} and they're level on total points. The data doesn't give us a winner here — which is the most annoying possible result.`;
+  else vt=`${fmt(totalGap)} points across ${n} season${n!==1?'s':''}. <b>${fw}</b> leads — but ${fl} refuses to accept it. This one stays alive.`;
   if(fraudPlayer)vt+=` And another thing: <b>${fraudPlayer.full.split(' ')[0]}</b> carries a better global FPL rank on average over these shared seasons — yet is losing the head-to-head. The data does not look good.`;
 
   // season table
@@ -1920,6 +1930,7 @@ function renderH2H(){
   :'';
 
   out.innerHTML=`
+    ${scopeChip}
     <div class="riv" style="margin-bottom:16px">
       <div class="vsrow">
         <div class="side ${aLeads&&ta!==tb?'lead':''}"><div class="nm">${A.full}</div><div class="cl">${A.club}</div><div class="pt">${fmt(ta)}</div></div>
@@ -1942,9 +1953,9 @@ function renderH2H(){
       </div>
 
       <div class="h2hcard">
-        <div class="h2hck">Points per Gameweek Gap</div>
-        <div class="h2hcv">${perGW} pts/GW</div>
-        <div class="h2hcd"><b>${fw}</b> outscores <b>${fl}</b> by approximately <b>${perGW} points every gameweek</b> on average. Over a full 38-game season that compounds into a gap that's very hard to close.</div>
+        <div class="h2hck">Average Margin per Season</div>
+        <div class="h2hcv">${ta===tb?'Level':'+'+fmt(avgMargin)+' pts'}</div>
+        <div class="h2hcd">${ta===tb?`Dead level — no average margin to speak of across these ${n} season${n!==1?'s':''}.`:`<b>${fw}</b> finishes an average of <b>${fmt(avgMargin)} points</b> ahead of <b>${fl}</b> per season. Over ${n} season${n!==1?'s':''}, that's the gap that actually defines this matchup.`}</div>
       </div>
 
       <div class="h2hcard ${streakLen>=3?'nasty':streakLen>=2?'cyan':''}">
