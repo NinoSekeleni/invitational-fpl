@@ -946,8 +946,6 @@ function clubBadge(club,size){
 function windowSeasons(mode){
   if(mode==='all')return ALLSEASONS.slice();
   if(mode==='inv')return ALLSEASONS.filter(s=>s>='2015/16');
-  if(mode==='decade')return ALLSEASONS.slice(-10);
-  if(mode==='past5')return ALLSEASONS.slice(-5);
   if(mode==='this')return [CURRENT];
   return [mode]; // single season
 }
@@ -1140,7 +1138,7 @@ function renderStatStrip(){
 }
 
 function renderSeg(){
-  const segs=[["this","This Season"],["past5","Past 5 Yrs"],["decade","Past Decade"],["inv","The Invitational"],["all","All-Time"]];
+  const segs=[["this","25/26 Season"],["inv","The Invitational"],["all","All-Time"]];
   document.getElementById('seg').innerHTML=segs.map(s=>`<button data-mode="${s[0]}" class="${MODE===s[0]?'on':''} ${s[0]==='inv'?'inv':''}">${s[1]}</button>`).join('');
   document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{MODE=b.dataset.mode;document.getElementById('seasonpick').value='';renderAll();});
 }
