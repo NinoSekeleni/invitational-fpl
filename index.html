@@ -958,7 +958,11 @@ function statsFor(p,seasons){
 }
 function leaderboard(mode,metric){
   const seasons=windowSeasons(mode);
-  let arr=PLAYERS.map(p=>({p,...statsFor(p,seasons)})).filter(o=>o.cnt>0);
+  let arr=PLAYERS.map(p=>{
+    // Invitational mode: only count seasons from when this player actually joined the league
+    const pSeasons=(mode==='inv'&&p.debut)?seasons.filter(s=>s>=p.debut):seasons;
+    return {p,...statsFor(p,pSeasons)};
+  }).filter(o=>o.cnt>0);
   if(metric==='avg')arr.sort((a,b)=>b.avg-a.avg||b.tot-a.tot);
   else if(metric==='best')arr.sort((a,b)=>(a.best||9e15)-(b.best||9e15)||b.tot-a.tot);
   else arr.sort((a,b)=>b.tot-a.tot||b.avg-a.avg);
@@ -1022,7 +1026,7 @@ const CLUBLINE={
  "Leeds United":["marching on together with Leeds","a proud Elland Road outlier","the lone Leeds voice in the group","flying the Whites' flag solo"]
 };
 function story(p){
-  const all=statsFor(p,ALLSEASONS), inv=statsFor(p,ALLSEASONS.filter(s=>s>='2015/16'));
+  const all=statsFor(p,ALLSEASONS), inv=statsFor(p,ALLSEASONS.filter(s=>s>=(p.debut||'2015/16')));
   const played=Object.keys(p.s).sort();
   const idx=PLAYERS.indexOf(p);
   const cl=CLUBLINE[p.club];
@@ -1600,7 +1604,7 @@ function renderDashboard(){
   ];
   document.getElementById('dashgrid').innerHTML=cards.map(c=>`<div class="dcard"><div class="di">${c[0]}</div><div class="dk">${c[1]}</div><div class="dv">${c[2]}</div><div class="ds">${c[3]}</div></div>`).join('');
   // top-5 teaser (invitational era, total)
-  const top5=PLAYERS.map(p=>({p,...statsFor(p,inv)})).filter(o=>o.cnt>0).sort((a,b)=>b.tot-a.tot).slice(0,5);
+  const top5=PLAYERS.map(p=>({p,...statsFor(p,ALLSEASONS.filter(s=>s>=(p.debut||'2015/16')))})).filter(o=>o.cnt>0).sort((a,b)=>b.tot-a.tot).slice(0,5);
   document.getElementById('hometeaser').innerHTML=top5.map((o,i)=>`<div class="trow t${i+1}">
       <div class="trk">${i+1}</div>
       <div class="tw">${clubBadge(o.p.club,26)}<div><div class="tn">${o.p.full}</div><div class="tc">${o.p.club}</div></div></div>
